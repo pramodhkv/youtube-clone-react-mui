@@ -1,5 +1,5 @@
 import React from "react";
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import { logo } from "../../utils/constants";
 import SearchBar from "../SearchBar";
@@ -14,14 +14,20 @@ const Navbar = () => {
         position: "sticky",
         background: "#000",
         top: 0,
-        justifyContent: "space-between",
       }}
     >
       <Link to="/" className="Navbar__logo">
         <img src={logo} alt="logo" height={45} />
       </Link>
 
-      <SearchBar />
+      <Stack
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        width="100%"
+      >
+        <SearchBar />
+      </Stack>
     </Stack>
   );
 };

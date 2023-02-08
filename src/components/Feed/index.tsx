@@ -4,30 +4,28 @@ import Sidebar from "../Sidebar";
 import Videos from "../Videos";
 import { fetchFromAPI } from "../../utils/api.js";
 import { categories } from "../../utils/constants";
+import Loader from "../Loader";
 
 const Feed = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>(
     categories[0].name
   );
   const [videos, setVideos] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (localStorage.getItem("videos")) {
-      setVideos(JSON.parse(localStorage.getItem("videos") || ""));
-    } else {
-      fetchFromAPI(`search?part=snippet&q=${selectedCategory}`)
-        .then((data) => {
-          localStorage.setItem("videos", JSON.stringify(data.items));
-          setVideos(data.items);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-    // fetchFromAPI(`search?part=snippet&q=${selectedCategory}`).then((data) => {
-    //   localStorage.setItem("videos", JSON.stringify(data.items));
-    //   setVideos(data.items);
-    // });
+    setLoading(true);
+
+    fetchFromAPI(`search?part=snippet&q=${selectedCategory}`)
+      .then((data) => {
+        setVideos(data.items);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [selectedCategory]);
 
   return (
@@ -67,11 +65,18 @@ const Feed = () => {
       </Box>
 
       <Box p={2} sx={{ overflowY: "auto", height: "90vh", flex: 2 }}>
-        <Typography variant="h4" fontWeight="bold" mb={2} color="white">
-          {selectedCategory} <span style={{ color: "#f31503" }}>videos</span>
-        </Typography>
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            <Typography variant="h4" fontWeight="bold" mb={2} color="white">
+              {selectedCategory}{" "}
+              <span style={{ color: "#f31503" }}>videos</span>
+            </Typography>
 
-        <Videos videos={videos}></Videos>
+            <Videos videos={videos}></Videos>
+          </>
+        )}
       </Box>
     </Stack>
   );

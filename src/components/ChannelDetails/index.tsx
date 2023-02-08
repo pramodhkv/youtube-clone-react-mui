@@ -3,47 +3,41 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { fetchFromAPI } from "../../utils/api";
 import ChannelCard from "../ChannelCard";
+import Loader from "../Loader";
 import Videos from "../Videos";
 
 const ChannelDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [channelDetail, setChannelDetail] = useState<any>();
   const [videos, setVideos] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (!id) return;
 
-    if (localStorage.getItem(`channelDetail-${id}`)) {
-      setChannelDetail(
-        JSON.parse(localStorage.getItem(`channelDetail-${id}`) || "")
-      );
-    } else {
-      fetchFromAPI(`channels?part=snippet&id=${id}`)
-        .then((data) => {
-          localStorage.setItem(
-            `channelDetail-${id}`,
-            JSON.stringify(data?.items[0])
-          );
-          setChannelDetail(data?.items[0]);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
+    setLoading(true);
 
-    if (localStorage.getItem(`videos-${id}`)) {
-      setVideos(JSON.parse(localStorage.getItem(`videos-${id}`) || ""));
-    } else {
-      fetchFromAPI(`search?part=snippet&channelId=${id}&order=date`)
-        .then((data) => {
-          localStorage.setItem(`videos-${id}`, JSON.stringify(data?.items));
-          setVideos(data?.items);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
+    fetchFromAPI(`channels?part=snippet&id=${id}`)
+      .then((data) => {
+        setChannelDetail(data?.items[0]);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    fetchFromAPI(`search?part=snippet&channelId=${id}&order=date`)
+      .then((data) => {
+        setVideos(data?.items);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }, [id]);
+
+  if (loading) return <Loader />;
 
   return (
     <Box minHeight="95vh">

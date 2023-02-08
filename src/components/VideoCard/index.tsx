@@ -31,7 +31,7 @@ const VideoCard = (props: IVideoCardProps) => {
     >
       <Link to={videoId ? `/video/${videoId}` : demoVideoUrl}>
         <CardMedia
-          image={snippet?.thumbnails?.high?.url}
+          image={snippet?.thumbnails?.high?.url || demoThumbnailUrl}
           sx={{
             width: {
               xs: "100%",

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 import { Link, useParams } from "react-router-dom";
 import { fetchFromAPI } from "../../utils/api";
+import Loader from "../Loader";
 import Videos from "../Videos";
 
 const VideoDetails = () => {
@@ -11,48 +12,34 @@ const VideoDetails = () => {
 
   const [videoDetail, setVideoDetail] = useState<any>(null);
   const [videos, setVideos] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (!id) return;
 
-    if (localStorage.getItem(`videoDetail-${id}`)) {
-      setVideoDetail(
-        JSON.parse(localStorage.getItem(`videoDetail-${id}`) || "")
-      );
-    } else {
-      fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
-        .then((data) => {
-          localStorage.setItem(
-            `videoDetail-${id}`,
-            JSON.stringify(data?.items[0])
-          );
-          setVideoDetail(data?.items[0]);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
+    setLoading(true);
 
-    if (localStorage.getItem(`suggestedVideos-${id}`)) {
-      setVideos(
-        JSON.parse(localStorage.getItem(`suggestedVideos-${id}`) || "")
-      );
-    } else {
-      fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`)
-        .then((data) => {
-          localStorage.setItem(
-            `suggestedVideos-${id}`,
-            JSON.stringify(data?.items)
-          );
-          setVideos(data?.items);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
+    fetchFromAPI(`videos?part=snippet,statistics&id=${id}`)
+      .then((data) => {
+        setVideoDetail(data?.items[0]);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+
+    fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`)
+      .then((data) => {
+        setVideos(data?.items);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }, [id]);
 
-  if (!videoDetail?.snippet) return <>Loading ...</>;
+  if (!videoDetail?.snippet || loading) return <Loader />;
 
   const {
     snippet: { title, channelId, channelTitle },

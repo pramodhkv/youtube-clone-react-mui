@@ -23,6 +23,10 @@ const SearchBar = () => {
         pl: 2,
         boxShadow: "none",
         mr: { sm: 5 },
+        width: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
       }}
     >
       <input

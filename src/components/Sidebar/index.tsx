@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from "react";
+import React, { SetStateAction } from "react";
 import { Stack } from "@mui/material";
 
 import { categories } from "../../utils/constants";

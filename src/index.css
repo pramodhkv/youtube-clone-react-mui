@@ -43,6 +43,7 @@ a {
   border: none;
   outline: none;
   width: 350px;
+  flex: 1;
 }
 
 .category-btn {
